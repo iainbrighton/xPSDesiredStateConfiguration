@@ -504,7 +504,7 @@ function Test-TargetResource
                                            $networkCredential.Domain, $networkCredential.UserName, $networkCredential.Password)
             $disposables.Add($credentialPrincipalContext) | out-null
         }
-    
+
         # Create local machine context.
         $localPrincipalContext = New-Object System.DirectoryServices.AccountManagement.PrincipalContext -ArgumentList ([System.DirectoryServices.AccountManagement.ContextType]::Machine)
         $disposables.Add($localPrincipalContext) | out-null
@@ -803,11 +803,15 @@ function IsSameDomain
 
     if ($isSameDomain -eq $false)
     {
-        $dotIndex = $PrincipalContext.ConnectedServer.IndexOf(".")
-        if ($dotIndex -ne -1)
+        $ConnectedServer = $PrincipalContext.ConnectedServer
+        if ($ConnectedServer)
         {
-            $principalDomain = $PrincipalContext.ConnectedServer.Substring($dotIndex + 1)
-            $isSameDomain = [System.String]::Compare($Domain, $principalDomain, [System.StringComparison]::OrdinalIgnoreCase) -eq 0
+            $dotIndex = $ConnectedServer.IndexOf(".")
+            if ($dotIndex -ne -1)
+            {
+                $principalDomain = $PrincipalContext.ConnectedServer.Substring($dotIndex + 1)
+                $isSameDomain = [System.String]::Compare($Domain, $principalDomain, [System.StringComparison]::OrdinalIgnoreCase) -eq 0
+            }
         }
     }
 
